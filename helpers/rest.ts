@@ -23,16 +23,18 @@ export const buildServerApiUrl = (server: Server) => {
   return serverUrl ? `${serverUrl}api` : undefined;
 };
 
-export const authorizationHeader: (server: Server) => {
-  Authorization?: string;
-} = server =>
-  server.auth === 'basic'
-    ? {
-        Authorization: `Basic ${Buffer.from(
-          `${server.credentials.username}:${server.credentials.password}`,
-        ).toString('base64')}`,
-      }
-    : {};
+export const buildHeaders = (server: Server) => {
+  const headers: Record<string, string> = {};
+  if (server.auth === 'basic') {
+    headers.Authorization = `Basic ${Buffer.from(
+      `${server.credentials.username}:${server.credentials.password}`,
+    ).toString('base64')}`;
+  }
+  server.headers?.forEach(header => {
+    headers[header.name] = header.value;
+  });
+  return headers;
+};
 
 export const useRest = () => {
   const intl = useIntl();
@@ -84,9 +86,7 @@ export const useRest = () => {
           `${url}${queryParams ? `?${new URLSearchParams(queryParams)}` : ''}`,
           {
             method,
-            headers: {
-              ...authorizationHeader(server),
-            },
+            headers: buildHeaders(server),
           },
         );
       crashlytics().log(`${method} ${url}`);
