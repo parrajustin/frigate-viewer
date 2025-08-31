@@ -10,6 +10,13 @@ Run `npm install` to install dependencies and `npm run android` to start the emu
 
 `google-services.json` file should be placed in `./android/app` folder - it should contain credentials to Firebase for Crashlytics service.
 
+```bash
+npm run android:bundle
+# Copy built in android/app/build/outputs/bundle/release/app-release.aab
+java -jar bundletool-all-1.18.1.jar build-apks --mode universal --bundle=./app-release.aab --output=app.apks --ks=demo.jks --ks-pass=pass:$PASS --ks-key-alias=frigate --key-pass=pass:$PASS
+# Rename to app.apks -> app.zip
+```
+
 ## iOS developing
 
 I've never run this application on iOS. It should work in theory, but probably needs some enhancements.
