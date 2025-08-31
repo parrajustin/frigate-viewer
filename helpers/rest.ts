@@ -37,7 +37,7 @@ export const buildHeaders = (server: Server) => {
   return headers;
 };
 
-export const authorizationHeader = buildHeaders;
+export const authorizationHeader = (server: Server) => buildHeaders(server);
 
 export const useRest = () => {
   const intl = useIntl();
@@ -47,13 +47,11 @@ export const useRest = () => {
       const url = `${buildServerApiUrl(server)}/login`;
       crashlytics().log(`POST ${url}`);
 
-      const headers: Record<string, string> = {
-          'Content-Type': 'application/json',
-          ...buildHeaders(server)
-      };
+      const headers: Record<string, string> = buildHeaders(server);
+      headers['Content-Type'] = 'application/json';
       const response = await fetch(url, {
         method: 'POST',
-        headers: new Header(headers),
+        headers: headers,
         body: JSON.stringify({
           user: server.credentials.username,
           password: server.credentials.password,
@@ -93,7 +91,7 @@ export const useRest = () => {
           `${url}${queryParams ? `?${new URLSearchParams(queryParams)}` : ''}`,
           {
             method,
-            headers: new Headers(headers),
+            headers: headers,
           },
         );
       crashlytics().log(`${method} ${url}`);
@@ -115,7 +113,10 @@ export const useRest = () => {
       }
       return response[json === false ? 'text' : 'json']();
     } catch (error) {
-      crashlytics().recordError(error as Error);
+      if (error instanceof Error) {
+        crashlytics().recordError(error as Error);
+      }
+      crashlytics().log(error as any);
       const e = error as {message: string};
       ToastAndroid.show(e.message, ToastAndroid.LONG);
       return Promise.reject();

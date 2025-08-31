@@ -8,6 +8,7 @@
     "android:release": "react-native run-android --mode=release",
     "android:build": "react-native build-android --mode=release",
     "android:bundle": "cd android && ./gradlew bundleRelease",
+    "android:bundleDev": "cd android && ./gradlew bundleDebug",
     "ios": "react-native run-ios",
     "lint": "eslint .",
     "start": "react-native start",
