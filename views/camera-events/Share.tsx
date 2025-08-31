@@ -5,7 +5,7 @@ import {useIntl} from 'react-intl';
 import RNFetchBlob from 'rn-fetch-blob';
 import RNShare from 'react-native-share';
 import {messages} from './messages';
-import {authorizationHeader, buildServerApiUrl} from '../../helpers/rest';
+import {buildHeaders, buildServerApiUrl} from '../../helpers/rest';
 import {useAppSelector} from '../../store/store';
 import {selectServer} from '../../store/settings';
 import {ActivityIndicator, Text, ToastAndroid} from 'react-native';
@@ -74,7 +74,7 @@ export const Share: FC<ShareProps> = ({event, onDismiss}) => {
         path: filePath,
       });
       await downloader
-        .fetch('GET', url, authorizationHeader(server))
+        .fetch('GET', url, buildHeaders(server))
         .progress((received, total) => {
           const progress = Math.round((received / total) * 100);
           setProgress(progress);

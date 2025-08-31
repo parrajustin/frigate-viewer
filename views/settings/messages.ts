@@ -27,6 +27,7 @@ export const messages = makeMessages('settings', {
   'server.customHeaders.header': 'Custom headers',
   'server.customHeaders.name.label': 'Header name',
   'server.customHeaders.value.label': 'Header value',
+  'server.customHeaders.remove': 'Remove header',
   'locale.header': 'Locale',
   'locale.region.label': 'Region',
   'locale.region.option.en_AU': 'Australia (English)',

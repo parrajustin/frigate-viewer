@@ -278,7 +278,7 @@ export const ServerForm: NavigationFunctionComponent<ServerProps> = ({
                     />
                   </Label>
                   <Button
-                    label={intl.formatMessage(messages['action.remove'])}
+                    label={intl.formatMessage(messages['server.customHeaders.remove'])}
                     size={Button.sizes.xSmall}
                     color={theme.link}
                     outlineColor={theme.link}

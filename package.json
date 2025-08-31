@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "android": "react-native run-android",
+    "android:debug": "react-native run-android --mode=debug",
     "android:release": "react-native run-android --mode=release",
     "android:build": "react-native build-android --mode=release",
     "android:bundle": "cd android && ./gradlew bundleRelease",

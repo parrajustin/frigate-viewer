@@ -1,9 +1,10 @@
 import {Buffer} from 'buffer';
-import {ToastAndroid} from 'react-native';
+import {LogBox, ToastAndroid} from 'react-native';
 import crashlytics from '@react-native-firebase/crashlytics';
 import {Server} from '../store/settings';
 import {useIntl} from 'react-intl';
 import {messages} from './rest.messages';
+import { Header } from 'react-native/Libraries/NewAppScreen';
 
 export const buildServerUrl = (server: Server) => {
   const {protocol, host, port, path} = server;
@@ -36,6 +37,8 @@ export const buildHeaders = (server: Server) => {
   return headers;
 };
 
+export const authorizationHeader = buildHeaders;
+
 export const useRest = () => {
   const intl = useIntl();
 
@@ -43,11 +46,14 @@ export const useRest = () => {
     try {
       const url = `${buildServerApiUrl(server)}/login`;
       crashlytics().log(`POST ${url}`);
+
+      const headers: Record<string, string> = {
+          'Content-Type': 'application/json',
+          ...buildHeaders(server)
+      };
       const response = await fetch(url, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: new Header(headers),
         body: JSON.stringify({
           user: server.credentials.username,
           password: server.credentials.password,
@@ -81,12 +87,13 @@ export const useRest = () => {
     try {
       const {queryParams, json} = options;
       const url = `${buildServerApiUrl(server)}/${endpoint}`;
+      const headers = buildHeaders(server);
       const executeFetch = () =>
         fetch(
           `${url}${queryParams ? `?${new URLSearchParams(queryParams)}` : ''}`,
           {
             method,
-            headers: buildHeaders(server),
+            headers: new Headers(headers),
           },
         );
       crashlytics().log(`${method} ${url}`);

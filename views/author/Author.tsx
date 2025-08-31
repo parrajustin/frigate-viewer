@@ -80,17 +80,7 @@ export const Author: NavigationFunctionComponent = ({componentId}) => {
           <Text style={styles.itemLabel}>
             {intl.formatMessage(messages['info.authorLabel'])}:{' '}
           </Text>
-          <Text style={styles.itemValue}>SP engineering</Text>
-        </Text>
-        <Text style={styles.item}>
-          <Text style={styles.itemLabel}>
-            {intl.formatMessage(messages['info.contactLabel'])}:{' '}
-          </Text>
-          <Text
-            style={[styles.itemValue, styles.link]}
-            onPress={openLink('mailto:szymon@piwowarczyk.net')}>
-            szymon@piwowarczyk.net
-          </Text>
+          <Text style={styles.itemValue}>Justin Parra & SP engineering & Gemini</Text>
         </Text>
         <View style={[styles.item, styles.repository]}>
           <Text style={styles.itemValue}>
@@ -103,9 +93,6 @@ export const Author: NavigationFunctionComponent = ({componentId}) => {
           </Text>
         </View>
       </View>
-      <BuyMeACoffee
-        onPress={openLink('https://www.buymeacoffee.com/sp.engineering')}
-      />
       <UsedLibs />
     </ScrollView>
   );
