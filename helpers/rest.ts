@@ -1,9 +1,10 @@
 import {Buffer} from 'buffer';
-import {ToastAndroid} from 'react-native';
+import {LogBox, ToastAndroid} from 'react-native';
 import crashlytics from '@react-native-firebase/crashlytics';
 import {Server} from '../store/settings';
 import {useIntl} from 'react-intl';
 import {messages} from './rest.messages';
+import { Header } from 'react-native/Libraries/NewAppScreen';
 
 export const buildServerUrl = (server: Server) => {
   const {protocol, host, port, path} = server;
@@ -23,16 +24,20 @@ export const buildServerApiUrl = (server: Server) => {
   return serverUrl ? `${serverUrl}api` : undefined;
 };
 
-export const authorizationHeader: (server: Server) => {
-  Authorization?: string;
-} = server =>
-  server.auth === 'basic'
-    ? {
-        Authorization: `Basic ${Buffer.from(
-          `${server.credentials.username}:${server.credentials.password}`,
-        ).toString('base64')}`,
-      }
-    : {};
+export const buildHeaders = (server: Server) => {
+  const headers: Record<string, string> = {};
+  if (server.auth === 'basic') {
+    headers.Authorization = `Basic ${Buffer.from(
+      `${server.credentials.username}:${server.credentials.password}`,
+    ).toString('base64')}`;
+  }
+  server.headers?.forEach(header => {
+    headers[header.name] = header.value;
+  });
+  return headers;
+};
+
+export const authorizationHeader = (server: Server) => buildHeaders(server);
 
 export const useRest = () => {
   const intl = useIntl();
@@ -41,11 +46,12 @@ export const useRest = () => {
     try {
       const url = `${buildServerApiUrl(server)}/login`;
       crashlytics().log(`POST ${url}`);
+
+      const headers: Record<string, string> = buildHeaders(server);
+      headers['Content-Type'] = 'application/json';
       const response = await fetch(url, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: headers,
         body: JSON.stringify({
           user: server.credentials.username,
           password: server.credentials.password,
@@ -79,14 +85,13 @@ export const useRest = () => {
     try {
       const {queryParams, json} = options;
       const url = `${buildServerApiUrl(server)}/${endpoint}`;
+      const headers = buildHeaders(server);
       const executeFetch = () =>
         fetch(
           `${url}${queryParams ? `?${new URLSearchParams(queryParams)}` : ''}`,
           {
             method,
-            headers: {
-              ...authorizationHeader(server),
-            },
+            headers: headers,
           },
         );
       crashlytics().log(`${method} ${url}`);
@@ -108,7 +113,10 @@ export const useRest = () => {
       }
       return response[json === false ? 'text' : 'json']();
     } catch (error) {
-      crashlytics().recordError(error as Error);
+      if (error instanceof Error) {
+        crashlytics().recordError(error as Error);
+      }
+      crashlytics().log(error as any);
       const e = error as {message: string};
       ToastAndroid.show(e.message, ToastAndroid.LONG);
       return Promise.reject();

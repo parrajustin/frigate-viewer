@@ -8,10 +8,10 @@ import {Dropdown} from '../../components/forms/Dropdown';
 import {Input} from '../../components/forms/Input';
 import {Label} from '../../components/forms/Label';
 import {Section} from '../../components/forms/Section';
-import {emptyServer, Server} from '../../store/settings';
+import {emptyServer, Header, Server} from '../../store/settings';
 import {useAppDispatch} from '../../store/store';
 import {messages} from './messages';
-import {ActionBar, View} from 'react-native-ui-lib';
+import {ActionBar, Button, View} from 'react-native-ui-lib';
 import {ScrollView} from 'react-native-gesture-handler';
 import {useTheme, useStyles} from '../../helpers/colors';
 
@@ -72,6 +72,12 @@ export const ServerForm: NavigationFunctionComponent<ServerProps> = ({
             password: yup.string().required(requiredError),
           }),
       }),
+      headers: yup.array().of(
+        yup.object().shape({
+          name: yup.string().required(requiredError),
+          value: yup.string().required(requiredError),
+        }),
+      ),
     });
   }, [intl]);
 
@@ -234,6 +240,70 @@ export const ServerForm: NavigationFunctionComponent<ServerProps> = ({
                   </Label>
                 </>
               )}
+            </Section>
+            <Section
+              header={intl.formatMessage(
+                messages['server.customHeaders.header'],
+              )}>
+              {values.headers?.map((header, i) => (
+                <View key={i}>
+                  <Label
+                    text={intl.formatMessage(
+                      messages['server.customHeaders.name.label'],
+                    )}
+                    error={
+                      errors.headers &&
+                      errors.headers[i] &&
+                      (errors.headers[i] as {name: string}).name
+                    }
+                    required={true}>
+                    <Input
+                      value={header.name}
+                      onChangeText={handleChange(`headers[${i}].name`)}
+                    />
+                  </Label>
+                  <Label
+                    text={intl.formatMessage(
+                      messages['server.customHeaders.value.label'],
+                    )}
+                    error={
+                      errors.headers &&
+                      errors.headers[i] &&
+                      (errors.headers[i] as {value: string}).value
+                    }
+                    required={true}>
+                    <Input
+                      value={header.value}
+                      onChangeText={handleChange(`headers[${i}].value`)}
+                    />
+                  </Label>
+                  <Button
+                    label={intl.formatMessage(messages['server.customHeaders.remove'])}
+                    size={Button.sizes.xSmall}
+                    color={theme.link}
+                    outlineColor={theme.link}
+                    outline
+                    onPress={() => {
+                      const updatedHeaders = [...(values.headers ?? [])];
+                      updatedHeaders.splice(i, 1);
+                      setFieldValue('headers', updatedHeaders);
+                    }}
+                  />
+                </View>
+              ))}
+              <Button
+                label={intl.formatMessage(messages['action.add'])}
+                size={Button.sizes.xSmall}
+                color={theme.link}
+                outlineColor={theme.link}
+                outline
+                onPress={() =>
+                  setFieldValue('headers', [
+                    ...(values.headers ?? []),
+                    {name: '', value: ''},
+                  ])
+                }
+              />
             </Section>
           </ScrollView>
           <ActionBar
