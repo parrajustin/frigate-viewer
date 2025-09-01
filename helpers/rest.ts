@@ -33,7 +33,7 @@ export const buildHeaders = (server: Server) => {
   server.headers?.forEach(header => {
     headers[header.name] = header.value;
   });
-  return headers;
+  return new Headers(headers);
 };
 
 export const authorizationHeader = (server: Server) => buildHeaders(server);
@@ -46,11 +46,11 @@ export const useRest = () => {
       const url = `${buildServerApiUrl(server)}/login`;
       crashlytics().log(`POST ${url}`);
 
-      const headers: Record<string, string> = buildHeaders(server);
-      headers['Content-Type'] = 'application/json';
+      const headers= buildHeaders(server);
+      headers.append('Content-Type', 'application/json');
       const response = await fetch(url, {
         method: 'POST',
-        headers: new Headers(headers),
+        headers: headers,
         body: JSON.stringify({
           user: server.credentials.username,
           password: server.credentials.password,
@@ -84,7 +84,7 @@ export const useRest = () => {
     try {
       const {queryParams, json} = options;
       const url = `${buildServerApiUrl(server)}/${endpoint}`;
-      const headers = new Headers(buildHeaders(server));
+      const headers = buildHeaders(server);
       const executeFetch = () =>
         fetch(
           `${url}${queryParams ? `?${new URLSearchParams(queryParams)}` : ''}`,

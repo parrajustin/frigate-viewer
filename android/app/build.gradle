@@ -82,8 +82,8 @@ android {
         applicationId "com.frigateviewer"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 24
-        versionName "14.3.4"
+        versionCode 25
+        versionName "14.3.5"
     }
     signingConfigs {
         debug {
