@@ -4,7 +4,6 @@ import crashlytics from '@react-native-firebase/crashlytics';
 import {Server} from '../store/settings';
 import {useIntl} from 'react-intl';
 import {messages} from './rest.messages';
-import { Header } from 'react-native/Libraries/NewAppScreen';
 
 export const buildServerUrl = (server: Server) => {
   const {protocol, host, port, path} = server;
@@ -85,7 +84,7 @@ export const useRest = () => {
     try {
       const {queryParams, json} = options;
       const url = `${buildServerApiUrl(server)}/${endpoint}`;
-      const headers = buildHeaders(server);
+      const headers = new Headers(buildHeaders(server));
       const executeFetch = () =>
         fetch(
           `${url}${queryParams ? `?${new URLSearchParams(queryParams)}` : ''}`,
