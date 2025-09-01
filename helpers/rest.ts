@@ -50,7 +50,7 @@ export const useRest = () => {
       headers['Content-Type'] = 'application/json';
       const response = await fetch(url, {
         method: 'POST',
-        headers: headers,
+        headers: new Headers(headers),
         body: JSON.stringify({
           user: server.credentials.username,
           password: server.credentials.password,
